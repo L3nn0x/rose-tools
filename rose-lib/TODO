@@ -1,0 +1,3 @@
+- Remove from_* functions from loaders to simplify their apis, implement some trait/generic function for performing those actions:
+    - from_file(), from_path(), from_reader(), w/e
+- Move vfs/lightmap/etc. into submodules named after their file types (e.g. /vfs, /lit, /zms)

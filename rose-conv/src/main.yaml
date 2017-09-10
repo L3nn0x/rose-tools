@@ -1,0 +1,18 @@
+name: Rose Converters
+version: "v1"
+author: Ralph Minderhoud <ralphminderhoud@gmail.com>
+about: Converts various ROSE Online formats
+
+args:
+    - file:
+        help: File to convert
+        required: true
+        index: 1
+    - out_dir:
+        help: Directory to output converted files
+        default_value: .
+        short: o
+
+subcommands:
+    - zms_to_obj:
+        about: Converts from ZMS to OBJ
