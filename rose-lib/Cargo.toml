@@ -2,9 +2,10 @@
 name = "roselib"
 version = "0.1.0"
 authors = ["Ralph Minderhoud <ralphminderhoud@gmail.com>"]
+homepage = "ralphminderhoud.com"
 
 [dependencies]
 byteorder = "~1.0.0"
-error-chain = "~0.10.0"
+error-chain = "^0.11"
 serde = "~0.9.11"
 serde_derive = "~0.9.11"

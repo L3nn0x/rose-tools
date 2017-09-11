@@ -26,16 +26,16 @@ pub struct ModelFile {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct ModelVertex {
-    position: Vector3<f32>,
-    normal: Vector3<f32>,
-    color: Color4,
-    bone_weights: Vector4<f32>,
-    bone_indices: Vector4<i16>,
-    tangent: Vector3<f32>,
-    uv1: Vector2<f32>,
-    uv2: Vector2<f32>,
-    uv3: Vector2<f32>,
-    uv4: Vector2<f32>,
+    pub position: Vector3<f32>,
+    pub normal: Vector3<f32>,
+    pub color: Color4,
+    pub bone_weights: Vector4<f32>,
+    pub bone_indices: Vector4<i16>,
+    pub tangent: Vector3<f32>,
+    pub uv1: Vector2<f32>,
+    pub uv2: Vector2<f32>,
+    pub uv3: Vector2<f32>,
+    pub uv4: Vector2<f32>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]

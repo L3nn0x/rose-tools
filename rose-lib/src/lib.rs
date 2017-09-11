@@ -9,7 +9,7 @@ extern crate serde_derive;
 
 pub mod io;
 pub mod utils;
-mod errors;
+pub mod errors;
 
 pub mod lightmap;
 pub mod model;

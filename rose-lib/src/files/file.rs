@@ -27,6 +27,14 @@ pub trait RoseFile {
         Ok(rf)
     }
 
+    fn from_reader<R: ReadRoseExt>(reader: &mut R) -> Result<Self>
+        where Self: Sized
+    {
+        let mut rf = Self::new();
+        rf.read(reader)?;
+        Ok(rf)
+    }
+
     // -- Methods
     fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()>;
     fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()>;

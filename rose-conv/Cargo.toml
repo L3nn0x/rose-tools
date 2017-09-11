@@ -2,6 +2,7 @@
 name = "roseconv"
 version = "0.1.0"
 authors = ["Ralph Minderhoud <ralphminderhoud@gmail.com>"]
+homepage = "ralphminderhoud.com"
 
 [dependencies]
 clap = {version = "^2", features = ["yaml"]}
