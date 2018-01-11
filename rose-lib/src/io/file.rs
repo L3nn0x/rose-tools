@@ -32,9 +32,9 @@ pub trait RoseFile {
     /// use roselib::io::RoseFile;
     ///
     /// let f = File::open("foo.zms").unwrap();
-    /// let _ = ZMS::from_file(f);
+    /// let _ = ZMS::from_file(&f);
     /// ```
-    fn from_file(file: File) -> Result<Self> 
+    fn from_file(file: &File) -> Result<Self> 
         where Self: Sized
     {
         let mut rf = Self::new();
@@ -53,9 +53,9 @@ pub trait RoseFile {
     ///
     /// let f = File::create("foo.zms").unwrap();
     /// let mut zms = ZMS::new();
-    /// let _ = zms.to_file(f);
+    /// let _ = zms.to_file(&f);
     /// ```
-    fn to_file(&mut self, file: File) -> Result<()> {
+    fn to_file(&mut self, file: &File) -> Result<()> {
         let mut writer = BufWriter::new(file);
         self.write(&mut writer)?;
         Ok(())
@@ -76,7 +76,7 @@ pub trait RoseFile {
         where Self: Sized
     {
         let f = File::open(path)?;
-        Self::from_file(f)
+        Self::from_file(&f)
     }
 
     /// Write data to file at `Path`
@@ -92,7 +92,7 @@ pub trait RoseFile {
     /// let _  = zms.to_path(&p);
     fn to_path(&mut self, path: &Path) -> Result<()> {
         let f = File::open(path)?;
-        self.to_file(f)?;
+        self.to_file(&f)?;
         Ok(())
     }
 }

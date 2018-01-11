@@ -7,12 +7,12 @@ extern crate roselib;
 
 use std::ffi::OsStr;
 use std::fs::{File, create_dir_all};
-use std::io::{Write, BufReader, BufWriter};
+use std::io::{Write, BufWriter};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
 use roselib::files::*;
-use roselib::io::{RoseFile};
+use roselib::io::RoseFile;
 
 mod errors;
 use errors::*;
@@ -68,10 +68,10 @@ fn main() {
 }
 
 fn zms_to_obj(input: File, output: File) -> Result<()> {
-    let mut reader = BufReader::new(input);
     let mut writer = BufWriter::new(output);
 
-    let z = ZMS::from_reader(&mut reader)?;
+    //let z = ZMS::from_reader(&mut reader)?;
+    let z = ZMS::from_file(&input)?;
 
     writer
         .write(format!("# Exported using {} v{} ({})\n",

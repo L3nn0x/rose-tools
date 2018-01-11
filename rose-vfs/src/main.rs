@@ -7,7 +7,8 @@ use std::fs::{File, create_dir_all};
 use std::io::{Read, Write, Seek, SeekFrom};
 use std::path::{Path, PathBuf};
 use std::process::exit;
-use roselib::vfs::VfsIndex;
+use roselib::files::IDX;
+use roselib::io::RoseFile;
 
 fn main() {
     let yaml = load_yaml!("vfs_extractor.yaml");
@@ -36,7 +37,7 @@ fn main() {
         }
     };
 
-    let idx = match VfsIndex::from_file(idx_file) {
+    let idx = match IDX::from_file(&idx_file) {
         Ok(i) => i,
         Err(e) => {
             println!("Error reading idx file: {}", e);
