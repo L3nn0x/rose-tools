@@ -15,6 +15,6 @@ pub mod lightmap;
 pub mod model;
 pub mod vfs;
 
-pub mod him;
+// pub mod him;
 
 pub mod files;

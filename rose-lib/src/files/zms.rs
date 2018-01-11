@@ -1,13 +1,11 @@
-//! Model
-//!
 //! ROSE Online 3D model
-use files::RoseFile;
 use utils::{BoundingBox, Color4, Vector2, Vector3, Vector4};
-use io::{ReadRoseExt, WriteRoseExt};
+use io::{RoseFile, ReadRoseExt, WriteRoseExt};
 use errors::*;
 
 pub type ZMS = ModelFile;
 
+/// ROSE Online 3D Model
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct ModelFile {
     pub identifier: String,

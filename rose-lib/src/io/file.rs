@@ -37,7 +37,7 @@ pub trait RoseFile {
 
     // -- Methods
     fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()>;
-    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()>;
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> ;
 
     fn load(&mut self, file: File) -> Result<()> {
         let mut reader = BufReader::new(file);

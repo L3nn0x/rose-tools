@@ -2,5 +2,5 @@
 members = [
     "rose-lib",
     "rose-conv",
-    "vfs-extractor",
+    "rose-vfs-tool",
 ]

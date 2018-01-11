@@ -1,6 +1,6 @@
 // pub mod idx;
-pub mod file;
-pub mod zms;
+mod him;
+mod zms;
 
-pub use self::file::RoseFile;
+pub use self::him::HIM;
 pub use self::zms::ZMS;

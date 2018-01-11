@@ -1,9 +1,12 @@
+//! ROSE Online Heightmap
 use std::f32;
 use errors::*;
-use io::ReadRoseExt;
+use io::{RoseFile, ReadRoseExt, WriteRoseExt};
 
+
+/// ROSE Online Heightmap
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Heightmap {
+pub struct HIM {
     pub width: i32,
     pub height: i32,
     pub grid_count: i32,
@@ -15,9 +18,9 @@ pub struct Heightmap {
     pub max_height: f32,
 }
 
-impl Heightmap {
-    pub fn new() -> Heightmap {
-        Heightmap {
+impl RoseFile for HIM {
+    fn new() -> HIM {
+        HIM {
             width: 0,
             height: 0,
             grid_count: 0,
@@ -29,7 +32,7 @@ impl Heightmap {
         }
     }
 
-    pub fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
         self.width = reader.read_i32()?;
         self.height = reader.read_i32()?;
         self.grid_count = reader.read_i32()?;
@@ -55,9 +58,12 @@ impl Heightmap {
             }
         }
 
-        // TODO: File contains more data but we probably don't care
+        // TODO: File contains more data
 
         Ok(())
+    }
 
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
+        unimplemented!();
     }
 }
