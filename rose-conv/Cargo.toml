@@ -5,6 +5,7 @@ authors = ["Ralph Minderhoud <ralphminderhoud@gmail.com>"]
 homepage = "ralphminderhoud.com"
 
 [dependencies]
-clap = {version = "^2", features = ["yaml"]}
-error-chain = "^0.11"
+clap = {version = "2.29", features = ["yaml"]}
+error-chain = "0.11"
+image = "0.18"
 roselib = {path = "../rose-lib"}

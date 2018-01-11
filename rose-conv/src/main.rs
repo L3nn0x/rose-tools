@@ -2,6 +2,7 @@
 extern crate clap;
 #[macro_use]
 extern crate error_chain;
+extern crate image;
 extern crate roselib;
 
 use std::ffi::OsStr;
@@ -11,6 +12,7 @@ use std::path::{Path, PathBuf};
 use std::process::exit;
 
 use roselib::files::*;
+use roselib::io::{RoseFile};
 
 mod errors;
 use errors::*;
