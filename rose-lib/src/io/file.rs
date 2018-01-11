@@ -6,48 +6,93 @@ use errors::*;
 use io::{ReadRoseExt, WriteRoseExt};
 
 pub trait RoseFile {
-    // -- Constructors
+    /// Construct a new file
+    ///
+    /// # Example 
+    /// ```rust
+    /// use roselib::files::ZMS;
+    /// use roselib::io::RoseFile;
+    ///
+    /// let _ = ZMS::new();
+    /// ```
     fn new() -> Self;
 
-
-    fn from_file(file: File) -> Result<Self>
-        where Self: Sized
-    {
-        let mut rf = Self::new();
-        rf.load(file)?;
-        Ok(rf)
-    }
-
-    fn from_path(path: &Path) -> Result<Self>
-        where Self: Sized
-    {
-        let mut rf = Self::new();
-        let f = File::open(path)?;
-        rf.load(f)?;
-        Ok(rf)
-    }
-
-    fn from_reader<R: ReadRoseExt>(reader: &mut R) -> Result<Self>
-        where Self: Sized
-    {
-        let mut rf = Self::new();
-        rf.read(reader)?;
-        Ok(rf)
-    }
-
-    // -- Methods
+    /// Read data from a reader
     fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()>;
+
+    /// Write data to a writer
     fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> ;
 
-    fn load(&mut self, file: File) -> Result<()> {
+    /// Read data from a `File`
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// use roselib::files::ZMS;
+    /// use roselib::io::RoseFile;
+    ///
+    /// let f = File::open("foo.zms").unwrap();
+    /// let _ = ZMS::from_file(f);
+    /// ```
+    fn from_file(file: File) -> Result<Self> 
+        where Self: Sized
+    {
+        let mut rf = Self::new();
         let mut reader = BufReader::new(file);
-        self.read(&mut reader)?;
+        rf.read(&mut reader)?;
+        Ok(rf)
+    }
+
+    /// Write data to a `File`
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use std::fs::File;
+    /// use roselib::files::ZMS;
+    /// use roselib::io::RoseFile;
+    ///
+    /// let f = File::create("foo.zms").unwrap();
+    /// let mut zms = ZMS::new();
+    /// let _ = zms.to_file(f);
+    /// ```
+    fn to_file(&mut self, file: File) -> Result<()> {
+        let mut writer = BufWriter::new(file);
+        self.write(&mut writer)?;
         Ok(())
     }
 
-    fn save(&mut self, file: File) -> Result<()> {
-        let mut writer = BufWriter::new(file);
-        self.write(&mut writer)?;
+    /// Read data from file at `Path`
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use std::path::PathBuf;
+    /// use roselib::files::ZMS;
+    /// use roselib::io::RoseFile;
+    ///
+    /// let p = PathBuf::from("/path/to/my.idx");
+    /// let _ = ZMS::from_path(&p);
+    /// ```
+    fn from_path(path: &Path) -> Result<Self>
+        where Self: Sized
+    {
+        let f = File::open(path)?;
+        Self::from_file(f)
+    }
+
+    /// Write data to file at `Path`
+    ///
+    /// # Example
+    /// ```rust,no_run
+    /// use std::path::PathBuf;
+    /// use roselib::files::ZMS;
+    /// use roselib::io::RoseFile;
+    ///
+    /// let p = PathBuf::from("/path/to/my.idx");
+    /// let mut zms = ZMS::new();
+    /// let _  = zms.to_path(&p);
+    fn to_path(&mut self, path: &Path) -> Result<()> {
+        let f = File::open(path)?;
+        self.to_file(f)?;
         Ok(())
     }
 }

@@ -1,19 +1,21 @@
-//! ROSE Online 3D model
+//! ROSE Online 3D Meshes
 use utils::{BoundingBox, Color4, Vector2, Vector3, Vector4};
 use io::{RoseFile, ReadRoseExt, WriteRoseExt};
 use errors::*;
 
-pub type ZMS = ModelFile;
 
-/// ROSE Online 3D Model
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct ModelFile {
+/// Mesh File
+pub type ZMS = Mesh;
+
+/// Mesh 
+#[derive(Debug, Serialize, Deserialize, PartialEq)] 
+pub struct Mesh {
     pub identifier: String,
     pub format: i32,
 
     pub bounding_box: BoundingBox<f32>,
     pub bones: Vec<i16>,
-    pub vertices: Vec<ModelVertex>,
+    pub vertices: Vec<Vertex>,
     pub indices: Vec<Vector3<i16>>,
     pub materials: Vec<i16>,
     pub strips: Vec<i16>,
@@ -22,8 +24,9 @@ pub struct ModelFile {
     pub pool: i16,
 }
 
+/// Mesh Vertex
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct ModelVertex {
+pub struct Vertex {
     pub position: Vector3<f32>,
     pub normal: Vector3<f32>,
     pub color: Color4,
@@ -36,8 +39,9 @@ pub struct ModelVertex {
     pub uv4: Vector2<f32>,
 }
 
+/// Mesh Vertex Flags
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub enum VertFormat {
+pub enum VertexFormat {
     Position = 1 << 1,
     Normal = 1 << 2,
     Color = 1 << 3,
@@ -50,83 +54,49 @@ pub enum VertFormat {
     UV4 = 1 << 10,
 }
 
-impl ModelFile {
-    /// Check if `ModelFile` has position vertices enabled
+impl Mesh {
     pub fn positions_enabled(&self) -> bool {
-        (VertFormat::Position as i32 & self.format) != 0
+        (VertexFormat::Position as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has normal vertices enabled
     pub fn normals_enabled(&self) -> bool {
-        (VertFormat::Normal as i32 & self.format) != 0
+        (VertexFormat::Normal as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has color vertices enabled
     pub fn colors_enabled(&self) -> bool {
-        (VertFormat::Color as i32 & self.format) != 0
+        (VertexFormat::Color as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has bones enabled
     pub fn bones_enabled(&self) -> bool {
-        ((VertFormat::BoneWeight as i32 & self.format) != 0) &&
-        ((VertFormat::BoneIndex as i32 & self.format) != 0)
+        ((VertexFormat::BoneWeight as i32 & self.format) != 0) &&
+        ((VertexFormat::BoneIndex as i32 & self.format) != 0)
     }
 
-    /// Check if `ModelFile` has color tangents enabled
     pub fn tangents_enabled(&self) -> bool {
-        (VertFormat::Tangent as i32 & self.format) != 0
+        (VertexFormat::Tangent as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has texture uv1 enabled
     pub fn uv1_enabled(&self) -> bool {
-        (VertFormat::UV1 as i32 & self.format) != 0
+        (VertexFormat::UV1 as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has texture uv2 enabled
     pub fn uv2_enabled(&self) -> bool {
-        (VertFormat::UV2 as i32 & self.format) != 0
+        (VertexFormat::UV2 as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has texture uv3 enabled
     pub fn uv3_enabled(&self) -> bool {
-        (VertFormat::UV3 as i32 & self.format) != 0
+        (VertexFormat::UV3 as i32 & self.format) != 0
     }
 
-    /// Check if `ModelFile` has texture uv4 enabled
     pub fn uv4_enabled(&self) -> bool {
-        (VertFormat::UV4 as i32 & self.format) != 0
-    }
-}
-
-impl ModelVertex {
-    pub fn new() -> ModelVertex {
-        ModelVertex {
-            position: Vector3::<f32>::new(),
-            normal: Vector3::<f32>::new(),
-            color: Color4::new(),
-            bone_weights: Vector4::<f32>::new(),
-            bone_indices: Vector4::<i16>::new(),
-            tangent: Vector3::<f32>::new(),
-            uv1: Vector2::<f32>::new(),
-            uv2: Vector2::<f32>::new(),
-            uv3: Vector2::<f32>::new(),
-            uv4: Vector2::<f32>::new(),
-        }
+        (VertexFormat::UV4 as i32 & self.format) != 0
     }
 }
 
 
-impl RoseFile for ModelFile {
-    /// Construct an empty `ModelFile`
-    ///
-    /// # Usage
-    /// ```rust
-    /// use roselib::files::{RoseFile, ZMS};
-    ///
-    /// let _ = ZMS::new();
-    /// ```
-    fn new() -> ModelFile {
-        ModelFile {
+impl RoseFile for Mesh {
+    fn new() -> Mesh {
+        Mesh {
             identifier: String::from(""),
             format: -1,
             bounding_box: BoundingBox {
@@ -142,28 +112,13 @@ impl RoseFile for ModelFile {
         }
     }
 
-    /// Read data from a reader
-    ///
-    /// # Usage
-    /// ```rust
-    /// use std::fs::File;
-    /// use std::io::BufReader;
-    /// use roselib::files::{RoseFile, ZMS};
-    ///
-    /// # fn foo() {
-    /// let f = File::open("foo.zms").unwrap();
-    /// let mut r = BufReader::new(f);
-    /// let mut z = ZMS::new();
-    /// z.read(&mut r);
-    /// # }
-    /// ```
     fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
         self.identifier = reader.read_cstring()?;
 
         let version = match self.identifier.as_str() {
             "ZMS0007" => 7,
             "ZMS0008" => 8,
-            _ => return Err("Unsupported ZMS version".into()),
+            _ => return Err("Unsupported Mesh version".into()),
         };
 
         self.format = reader.read_i32()?;
@@ -177,7 +132,7 @@ impl RoseFile for ModelFile {
 
         let vert_count = reader.read_i16()?;
         for _ in 0..vert_count {
-            self.vertices.push(ModelVertex::new());
+            self.vertices.push(Vertex::new());
         }
 
         if self.positions_enabled() {
@@ -257,20 +212,6 @@ impl RoseFile for ModelFile {
         Ok(())
     }
 
-    /// Save a Model to a writer
-    ///
-    /// # Usage
-    /// ```rust
-    /// use std::fs::File;
-    /// use std::io::BufWriter;
-    /// use roselib::files::{RoseFile,ZMS};
-    ///
-    /// # fn foo() {
-    /// let f = File::open("foo.zms").unwrap();
-    /// let mut w = BufWriter::new(f);
-    /// let mut z = ZMS::new();
-    /// z.write(&mut w);
-    /// # }
     fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
         writer.write_cstring("ZMS0008")?;
         writer.write_i32(self.format)?;
@@ -361,116 +302,20 @@ impl RoseFile for ModelFile {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::fs::File;
-    use std::io::Cursor;
-    use std::path::PathBuf;
-
-    #[test]
-    fn model_load() {
-        let mut root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        root.push("tests");
-        root.push("data");
-
-        let file1 = root.join("HEADBAD01.ZMS");
-        let file2 = root.join("STONE014.ZMS");
-        let file3 = root.join("CART01_ABILITY01.ZMS");
-
-        let model1 = ModelFile::from_path(&file1).unwrap();
-        assert_eq!(model1.identifier.as_str(), "ZMS0008");
-        assert_eq!(model1.format, 182);
-        assert_eq!(model1.positions_enabled(), true);
-        assert_eq!(model1.normals_enabled(), true);
-        assert_eq!(model1.colors_enabled(), false);
-        assert_eq!(model1.bones_enabled(), true);
-        assert_eq!(model1.tangents_enabled(), false);
-        assert_eq!(model1.uv1_enabled(), true);
-        assert_eq!(model1.uv2_enabled(), false);
-        assert_eq!(model1.uv3_enabled(), false);
-        assert_eq!(model1.uv4_enabled(), false);
-
-        assert_eq!(model1.bones.len(), 8);
-        assert_eq!(model1.vertices.len(), 336);
-        assert_eq!(model1.indices.len(), 578);
-        assert_eq!(model1.materials.len(), 6);
-        assert_eq!(model1.strips.len(), 0);
-        assert_eq!(model1.pool, 0);
-
-        let model2 = ModelFile::from_path(&file2).unwrap();
-        assert_eq!(model2.identifier.as_str(), "ZMS0007");
-        assert_eq!(model2.format, 390);
-        assert_eq!(model2.positions_enabled(), true);
-        assert_eq!(model2.normals_enabled(), true);
-        assert_eq!(model2.colors_enabled(), false);
-        assert_eq!(model2.bones_enabled(), false);
-        assert_eq!(model2.tangents_enabled(), false);
-        assert_eq!(model2.uv1_enabled(), true);
-        assert_eq!(model2.uv2_enabled(), true);
-        assert_eq!(model2.uv3_enabled(), false);
-        assert_eq!(model2.uv4_enabled(), false);
-
-        assert_eq!(model2.bones.len(), 0);
-        assert_eq!(model2.vertices.len(), 131);
-        assert_eq!(model2.indices.len(), 128);
-        assert_eq!(model2.materials.len(), 0);
-        assert_eq!(model2.strips.len(), 0);
-        assert_eq!(model2.pool, 0);
-
-        let model3 = ModelFile::from_path(&file3).unwrap();
-        assert_eq!(model3.identifier.as_str(), "ZMS0008");
-        assert_eq!(model3.format, 134);
-        assert_eq!(model3.positions_enabled(), true);
-        assert_eq!(model3.normals_enabled(), true);
-        assert_eq!(model3.colors_enabled(), false);
-        assert_eq!(model3.bones_enabled(), false);
-        assert_eq!(model3.tangents_enabled(), false);
-        assert_eq!(model3.uv1_enabled(), true);
-        assert_eq!(model3.uv2_enabled(), false);
-        assert_eq!(model3.uv3_enabled(), false);
-        assert_eq!(model3.uv4_enabled(), false);
-
-        assert_eq!(model3.bones.len(), 0);
-        assert_eq!(model3.vertices.len(), 544);
-        assert_eq!(model3.indices.len(), 532);
-        assert_eq!(model3.materials.len(), 2);
-        assert_eq!(model3.strips.len(), 0);
-        assert_eq!(model3.pool, 0);
-    }
-
-    #[test]
-    fn model_save() {
-        let mut root = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        root.push("tests");
-        root.push("data");
-
-        let file1 = root.join("HEADBAD01.ZMS");
-        let file2 = root.join("STONE014.ZMS");
-        let file3 = root.join("CART01_ABILITY01.ZMS");
-
-        for zms_file in [file1, file2, file3].iter() {
-            let f = File::open(&zms_file).unwrap();
-            let zms_size = f.metadata().unwrap().len();
-
-            let mut orig_zms = ModelFile::from_path(&zms_file).unwrap();
-
-            let mut buffer: Vec<u8> = Vec::new();
-            buffer.resize(zms_size as usize, 0u8);
-
-            let mut cursor = Cursor::new(buffer);
-            orig_zms.write(&mut cursor).unwrap();
-
-            cursor.set_position(0);
-
-            let mut new_zms = ModelFile::new();
-            new_zms.read(&mut cursor).unwrap();
-
-            if orig_zms.identifier.as_str() == "ZMS0007" {
-                orig_zms.identifier = String::from("ZMS0008");
-            }
-
-            assert_eq!(orig_zms, new_zms);
+impl Vertex {
+    pub fn new() -> Vertex {
+        Vertex {
+            position: Vector3::<f32>::new(),
+            normal: Vector3::<f32>::new(),
+            color: Color4::new(),
+            bone_weights: Vector4::<f32>::new(),
+            bone_indices: Vector4::<i16>::new(),
+            tangent: Vector3::<f32>::new(),
+            uv1: Vector2::<f32>::new(),
+            uv2: Vector2::<f32>::new(),
+            uv3: Vector2::<f32>::new(),
+            uv4: Vector2::<f32>::new(),
         }
     }
 }
+

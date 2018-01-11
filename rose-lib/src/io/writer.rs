@@ -1,4 +1,4 @@
-use std::io::Write;
+use std::io::{Write, Seek};
 use byteorder::{WriteBytesExt, LittleEndian};
 
 use errors::*;
@@ -10,7 +10,7 @@ use utils::{Color4, Vector2, Vector3, Vector4};
 /// ```rust,no_run
 /// use std::fs::File;
 /// use std::io::BufWriter;
-/// use roseon::io::WriteRoseExt;
+/// use roselib::io::WriteRoseExt;
 ///
 /// let f = File::open("my_file.ext").unwrap();
 /// let mut writer = BufWriter::new(f);
@@ -23,7 +23,7 @@ use utils::{Color4, Vector2, Vector3, Vector4};
 /// NOTE: Strings are encoded as UTF-8 and no UTF-8 strings are lossily encoded
 /// into UTF-8. The original ROSE files were encoded as EUC-KR, as such some
 /// data may be lost.
-pub trait WriteRoseExt {
+pub trait WriteRoseExt: Write + Seek {
     fn write_u8(&mut self, n: u8) -> Result<()>;
     fn write_u16(&mut self, n: u16) -> Result<()>;
     fn write_u32(&mut self, n: u32) -> Result<()>;
@@ -59,6 +59,7 @@ pub trait WriteRoseExt {
 
 impl<W> WriteRoseExt for W
     where W: Write,
+          W: Seek,
           W: WriteBytesExt
 {
     fn write_u8(&mut self, n: u8) -> Result<()> {

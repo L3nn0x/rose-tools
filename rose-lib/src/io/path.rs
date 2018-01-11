@@ -21,7 +21,7 @@ pub trait PathRoseExt {
     /// # Examples
     /// ```
     /// use std::path::PathBuf;
-    /// use roseon::io::{PathRoseExt};
+    /// use roselib::io::{PathRoseExt};
     ///
     /// let foo = PathBuf::from_rose_path("FOO/BAR\\BAZ");
     /// assert_eq!(foo.file_name().unwrap().to_str(), Some("BAZ"));
@@ -33,7 +33,7 @@ pub trait PathRoseExt {
     /// # Examples
     /// ```
     /// use std::path::PathBuf;
-    /// use roseon::io::{PathRoseExt};
+    /// use roselib::io::{PathRoseExt};
     ///
     /// let path = PathBuf::from("FOO/BAR\\BAZ");
     /// let str = path.to_rose_path();

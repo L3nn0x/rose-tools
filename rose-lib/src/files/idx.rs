@@ -1,4 +1,4 @@
-//! Virtual File System
+//! ROSE Online Virtual File Systems
 //!
 //! ROSE Online uses a virtual file system to pack assets and ship with the
 //! client. Assets are stored in binary blobs (.vfs) with an index (.idx)
@@ -16,9 +16,10 @@
 //!
 //! ```rust,no_run
 //! use std::path::Path;
-//! use roseon::vfs::VfsIndex;
+//! use roselib::files::IDX;
+//! use roselib::io::RoseFile;
 //!
-//! let idx = VfsIndex::from_path(Path::new("/path/to/index.idx")).unwrap();
+//! let idx = IDX::from_path(Path::new("/path/to/index.idx")).unwrap();
 //!
 //! for vfs in idx.file_systems {
 //!     for vfs_file in vfs.files {
@@ -26,12 +27,14 @@
 //!     }
 //! }
 //! ```
-use std::fs::File;
-use std::io::{BufReader, BufWriter, Seek, SeekFrom};
-use std::path::{PathBuf, Path};
+use std::io::SeekFrom;
+use std::path::PathBuf;
 
 use errors::*;
-use io::{ReadRoseExt, WriteRoseExt, PathRoseExt};
+use io::{RoseFile, ReadRoseExt, WriteRoseExt, PathRoseExt};
+
+/// Virtual file system index file
+pub type IDX = VfsIndex;
 
 /// Virtual file system index
 ///
@@ -72,16 +75,35 @@ pub struct VfsFileMetadata {
     pub checksum: i32,
 }
 
-impl VfsIndex {
-    /// Construct an empty `VfsIndex`
-    ///
-    /// # Usage
-    /// ```rust
-    /// use roseon::vfs::VfsIndex;
-    ///
-    /// let _ = VfsIndex::new();
-    /// ```
-    pub fn new() -> VfsIndex {
+impl VfsMetadata {
+    /// Construct an empty virtual file system
+    pub fn new() -> VfsMetadata {
+        VfsMetadata {
+            filename: PathBuf::new(),
+            files: Vec::new(),
+        }
+    }
+}
+
+impl VfsFileMetadata {
+    /// Construct an empty virtual file system file
+    pub fn new() -> VfsFileMetadata {
+        VfsFileMetadata {
+            filepath: PathBuf::new(),
+            offset: 0,
+            size: 0,
+            block_size: 0,
+            is_deleted: false,
+            is_compressed: false,
+            is_encrypted: false,
+            version: 0,
+            checksum: 0,
+        }
+    }
+}
+
+impl RoseFile for VfsIndex {
+    fn new() -> VfsIndex {
         VfsIndex {
             base_version: 0,
             current_version: 0,
@@ -89,86 +111,8 @@ impl VfsIndex {
         }
     }
 
-    /// Construct a `VfsIndex` from a file
-    ///
-    /// # Usage
-    /// ```rust,no_run
-    /// use std::fs::File;
-    /// use roseon::vfs::VfsIndex;
-    ///
-    /// let f = File::open("foo.idx").unwrap();
-    /// let _ = VfsIndex::from_file(f);
-    /// ```
-    pub fn from_file(file: File) -> Result<VfsIndex> {
-        let mut idx = VfsIndex::new();
-        idx.load(file)?;
-        Ok(idx)
-    }
-
-    /// Construct a `VfsIndex` from a path slice
-    ///
-    /// # Usage
-    /// ```rust,no_run
-    /// use std::path::PathBuf;
-    /// use roseon::vfs::VfsIndex;
-    ///
-    /// let p = PathBuf::from("/path/to/my.idx");
-    /// let _ = VfsIndex::from_path(&p);
-    /// ```
-    pub fn from_path(path: &Path) -> Result<VfsIndex> {
-        let mut idx = VfsIndex::new();
-        let f = File::open(path)?;
-        idx.load(f)?;
-        Ok(idx)
-    }
-
-    /// Load a `VfsIndex` from a file
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// use std::fs::File;
-    /// use roseon::vfs::VfsIndex;
-    ///
-    /// let f = File::open("example.idx").unwrap();
-    /// let mut idx = VfsIndex::new();
-    /// idx.load(f).unwrap();
-    ///
-    /// for vfs in idx.file_systems {
-    ///     for _ in vfs.files {
-    ///         // Do something, e.g. copy bytes to local file system
-    ///
-    ///     }
-    /// }
-    /// ```
-    pub fn load(&mut self, file: File) -> Result<()> {
-        let mut reader = BufReader::new(file);
-        self.load_reader(&mut reader)?;
-        Ok(())
-    }
-
-    /// Save a `VfsIndex` to a file
-    ///
-    /// # Example
-    /// ```rust,no_run
-    /// use std::fs::File;
-    /// use roseon::vfs::VfsIndex;
-    ///
-    /// let in_file = File::open("in.idx").unwrap();
-    /// let out_file = File::open("out.idx").unwrap();
-    ///
-    /// let mut idx = VfsIndex::from_file(in_file).unwrap();
-    ///
-    /// // Do something with index
-    /// idx.save(out_file).unwrap();
-    /// ```
-    pub fn save(&mut self, file: File) -> Result<()> {
-        let mut writer = BufWriter::new(file);
-        self.save_writer(&mut writer)?;
-        Ok(())
-    }
-
     /// Load a `VfsIndex` from a reader
-    fn load_reader<R: ReadRoseExt + Seek>(&mut self, reader: &mut R) -> Result<()> {
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
         self.base_version = reader.read_i32()?;
         self.current_version = reader.read_i32()?;
 
@@ -209,7 +153,7 @@ impl VfsIndex {
     }
 
     /// Save a `VfsIndex` to a writer
-    pub fn save_writer<W: WriteRoseExt + Seek>(&mut self, writer: &mut W) -> Result<()> {
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
         writer.write_i32(self.base_version)?;
         writer.write_i32(self.current_version)?;
         writer.write_i32(self.file_systems.len() as i32)?;
@@ -262,110 +206,4 @@ impl VfsIndex {
     }
 }
 
-impl VfsMetadata {
-    /// Construct an empty virtual file system
-    pub fn new() -> VfsMetadata {
-        VfsMetadata {
-            filename: PathBuf::new(),
-            files: Vec::new(),
-        }
-    }
-}
 
-impl VfsFileMetadata {
-    /// Construct an empty virtual file system file
-    pub fn new() -> VfsFileMetadata {
-        VfsFileMetadata {
-            filepath: PathBuf::new(),
-            offset: 0,
-            size: 0,
-            block_size: 0,
-            is_deleted: false,
-            is_compressed: false,
-            is_encrypted: false,
-            version: 0,
-            checksum: 0,
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::io::Cursor;
-    use std::path::PathBuf;
-
-    #[test]
-    fn vfs_index_load() {
-        let mut idx_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        idx_path.push("tests");
-        idx_path.push("data");
-        idx_path.push("data.idx");
-
-        let idx = VfsIndex::from_path(&idx_path).unwrap();
-
-        assert_eq!(idx.base_version, 129);
-        assert_eq!(idx.current_version, 129);
-        assert_eq!(idx.file_systems.len(), 2);
-
-        let ref data_vfs = idx.file_systems[0];
-        let ref data_vfs_last = data_vfs.files[data_vfs.files.len() - 1];
-
-        assert_eq!(data_vfs.filename.to_str().unwrap(), "DATA.VFS");
-        assert_eq!(data_vfs.files.len(), 3193);
-        assert_eq!(data_vfs_last.filepath.to_str().unwrap(),
-                   "3DDATA/EFFECT/_YETITYRANT_SKILL_01.EFT");
-
-        let ref map_vfs = idx.file_systems[1];
-        let ref map_vfs_last = map_vfs.files[map_vfs.files.len() - 1];
-
-        assert_eq!(map_vfs.filename.to_str().unwrap(), "MAP.VFS");
-        assert_eq!(map_vfs.files.len(), 11053);
-        assert_eq!(map_vfs_last.filepath.to_str().unwrap(),
-                   "3DDATA/TERRAIN/TILES/ZONETYPEINFO.STB");
-    }
-
-    #[test]
-    fn vfs_index_save() {
-        let mut idx_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        idx_path.push("tests");
-        idx_path.push("data");
-        idx_path.push("data.idx");
-
-        let f = File::open(&idx_path).unwrap();
-        let idx_size = f.metadata().unwrap().len();
-
-        let mut orig_idx = VfsIndex::from_file(f).unwrap();
-
-        let mut buffer: Vec<u8> = Vec::new();
-        buffer.resize(idx_size as usize, 0u8);
-
-        let mut cursor = Cursor::new(buffer);
-        orig_idx.save_writer(&mut cursor).unwrap();
-
-        // Load again to check save was successful
-        cursor.set_position(0);
-        let mut new_idx = VfsIndex::new();
-        new_idx.load_reader(&mut cursor).unwrap();
-
-        assert_eq!(new_idx.base_version, 129);
-        assert_eq!(new_idx.current_version, 129);
-        assert_eq!(new_idx.file_systems.len(), 2);
-
-        let ref data_vfs = new_idx.file_systems[0];
-        let ref data_vfs_last = data_vfs.files[data_vfs.files.len() - 1];
-
-        assert_eq!(data_vfs.filename.to_str().unwrap(), "DATA.VFS");
-        assert_eq!(data_vfs.files.len(), 3193);
-        assert_eq!(data_vfs_last.filepath.to_str().unwrap(),
-                   "3DDATA/EFFECT/_YETITYRANT_SKILL_01.EFT");
-
-        let ref map_vfs = new_idx.file_systems[1];
-        let ref map_vfs_last = map_vfs.files[map_vfs.files.len() - 1];
-
-        assert_eq!(map_vfs.filename.to_str().unwrap(), "MAP.VFS");
-        assert_eq!(map_vfs.files.len(), 11053);
-        assert_eq!(map_vfs_last.filepath.to_str().unwrap(),
-                   "3DDATA/TERRAIN/TILES/ZONETYPEINFO.STB");
-    }
-}

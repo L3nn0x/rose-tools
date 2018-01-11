@@ -10,7 +10,7 @@ use utils::{Color4, Vector2, Vector3, Vector4};
 /// ```rust,no_run
 /// use std::fs::File;
 /// use std::io::BufReader;
-/// use roseon::io::ReadRoseExt;
+/// use roselib::io::ReadRoseExt;
 ///
 /// let f = File::open("my_file.ext").unwrap();
 /// let mut reader = BufReader::new(f);
@@ -24,7 +24,7 @@ use utils::{Color4, Vector2, Vector3, Vector4};
 ///
 /// NOTE: Strings are encoded as UTF-8 and the original ROSE files were encoded
 /// as EUC-KR, as such some string data may be lost.
-pub trait ReadRoseExt {
+pub trait ReadRoseExt: Read + Seek + BufRead {
     fn read_u8(&mut self) -> Result<u8>;
     fn read_u16(&mut self) -> Result<u16>;
     fn read_u32(&mut self) -> Result<u32>;
@@ -120,7 +120,6 @@ impl<R> ReadRoseExt for R
         bytes.read_to_end(&mut buffer)?;
 
         // Remove terminating null bytes
-        //if buffer[buffer.len() - 1] == 0x00 {
         if let Some(&0x00) = buffer.last() {
             let _ = buffer.pop();
         }
