@@ -2,29 +2,24 @@
 A Rust library for working with ROSE Online's file formats.
 
 
-## Build
-To compile the library and all the binaries simply run `cargo build --release`
-
 ## Library
-[Documentation]()
-
 This crate provides a Rust library that can be used in other projects. See
 the documentation for more information
 
 Add `roseon` as a dependency in your `Cargo.toml`
 ```toml
 [dependencies]
-roseon="*"
+roselib="../path/to/rose-lib"
 
 ```
 Use it in your project
 ```rust
-extern crate roseon
+extern crate roselib;
 
 use std::path::Path;
-use roseon::vfs::VfsIndex;
+use roselib::files::IDX;
 
-let idx = VfsIndex::from_path(Path::new("/path/to/index.idx")).unwrap();
+let idx = IDX::from_path(Path::new("/path/to/index.idx")).unwrap();
 
 for vfs in idx.file_systems {
   for vfs_file in vfs.files {
@@ -34,8 +29,10 @@ for vfs in idx.file_systems {
 ```
 
 ### Supported File formats
-* IDX
-* LIT
+* HIM - ROSE Heightmap [Partial]
+* IDX (VFS) - ROSE Virtual filesystem
+* LIT - ROSE Lightmap
+* ZMS - ROSE 3D Mesh
 
 ## Compatibility
 * This code has only been tested against rose_129_129en and is not guaranteed 
