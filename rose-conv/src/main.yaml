@@ -4,14 +4,16 @@ author: Ralph Minderhoud <ralphminderhoud@gmail.com>
 about: Converts various ROSE Online formats
 
 args:
-    - file:
-        help: ZMS file to convert
-        required: true
     - out_dir:
         help: Directory to output converted files
-        default_value: .
+        default_value: out/
         short: o
+        global: true
 
 subcommands:
-    - zms_to_obj:
-        about: Converts from ZMS to OBJ
+    - terrain:
+        about: Convert a ROSE terrain
+        args:
+            - file:
+                help: .ZON file
+                required: true

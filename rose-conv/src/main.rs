@@ -11,6 +11,7 @@ use std::io::{Write, BufWriter};
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
+use clap::ArgMatches;
 use roselib::files::*;
 use roselib::io::RoseFile;
 
@@ -21,6 +22,25 @@ fn main() {
     let yaml = load_yaml!("main.yaml");
     let matches = clap::App::from_yaml(yaml).get_matches();
 
+    // Setup output directory
+    let out_dir = Path::new(matches.value_of("out_dir").unwrap());
+    if let Err(e) = create_dir_all(&out_dir) {
+        eprintln!("Error creating output directory {}: {}",
+                  out_dir.to_str().unwrap_or(""),
+                  e);
+        exit(1);
+    }
+
+    // Run subcommands
+    match matches.subcommand() {
+        ("terrain", Some(ref matches)) => convert_terrain(matches),
+        _ => {
+            eprintln!("Subcommand not recognized");
+            exit(1);
+        }
+    }
+
+    /*
     // -- Setup input file
     let in_path = Path::new(matches.value_of("file").unwrap());
     let in_file = match File::open(in_path) {
@@ -31,14 +51,6 @@ fn main() {
         }
     };
 
-    // -- Setup output file
-    let out_dir = Path::new(matches.value_of("out_dir").unwrap());
-    if let Err(e) = create_dir_all(&out_dir) {
-        eprintln!("Error creating output directory {}: {}",
-                  out_dir.to_str().unwrap_or(""),
-                  e);
-        exit(1);
-    }
 
     let mut out_filepath = PathBuf::from(out_dir);
     out_filepath.push(in_path.file_name().unwrap_or(OsStr::new("out.obj")));
@@ -65,6 +77,19 @@ fn main() {
         eprintln!("Error converting the file: {}", e);
         exit(1);
     }
+    */
+}
+
+fn convert_terrain(matches: &ArgMatches) {
+    println!("{:?}", matches.value_of("file").unwrap());
+    // TODO:
+    // Check file exists
+    // Get tile coordinates map from directory (e.g. tile[0][0] = "29_29")
+    // Assemble heightmap image
+    // Load ZON file
+    // Convert tile section to JSON
+    // Create N alphamap images for each tile index
+    //
 }
 
 fn zms_to_obj(input: File, output: File) -> Result<()> {
