@@ -1,9 +1,9 @@
 tool
 extends EditorImportPlugin
 
-const RoseFile = preload("./files/file.gd")
+const RoseFile = preload("file.gd")
 const Utils = preload("utils.gd")
-const ZMD = preload("./files/zmd.gd")
+const ZMD = preload("zmd.gd")
 
 func get_importer_name():
 	return "rose.zmd.import"

@@ -1,10 +1,10 @@
 tool
 extends EditorImportPlugin
 
-const RoseFile = preload("./files/file.gd")
+const RoseFile = preload("file.gd")
 const Utils = preload("utils.gd")
-const ZMO = preload("./files/zmo.gd")
-const ZMD = preload("./files/zmd.gd")
+const ZMO = preload("zmo.gd")
+const ZMD = preload("zmd.gd")
 
 func get_importer_name():
 	return "rose.zmo.import"
@@ -26,13 +26,14 @@ func get_preset_name(preset):
 		
 func get_import_options(preset):
 	return [{"name": "skeleton", "default_value": "", "property_hint": PROPERTY_HINT_FILE}]
-	
-func get_resource_type():
-	return "Animation"
 
 func get_option_visibility(option, options):
 	return true
 	
+func get_resource_type():
+	return "Animation"
+
+
 func import(src, dst, options, r_platform_variants, r_gen_files):
 	var skel_path = options["skeleton"]
 	if not skel_path:

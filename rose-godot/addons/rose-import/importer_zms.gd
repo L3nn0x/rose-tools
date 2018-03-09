@@ -1,9 +1,9 @@
 tool
 extends EditorImportPlugin 
 
-const RoseFile = preload("./files/file.gd")
+const RoseFile = preload("file.gd")
 const Utils = preload("utils.gd")
-const ZMS = preload("./files/zms.gd")
+const ZMS = preload("zms.gd")
 
 func get_importer_name():
 	return "rose.zms.import"
@@ -18,10 +18,16 @@ func get_save_extension():
 	return "mesh"
 
 func get_preset_count():
-	return 0
-	
-func get_import_options():
-	return null
+	return 1
+
+func get_preset_name(preset):
+	return "Default"
+
+func get_import_options(preset):
+	return [{"name": "texture", "default_value": "", "property_hint": PROPERTY_HINT_FILE}]
+
+func get_option_visibility(option, options):
+	return true
 	
 func get_resource_type():
 	return "Mesh"
@@ -42,7 +48,10 @@ func import(src, dst, options, r_platform_variants, r_gen_files):
 		if zms.colors_enabled():
 			st.add_color(zms.vertices[vi].color)
 		if zms.bones_enabled():
-			st.add_bones(zms.vertices[vi].bone_indices)
+			var bones = []
+			for bi in range(4):
+				bones.append(zms.bones[zms.vertices[vi].bone_indices[bi]])
+			st.add_bones(bones)
 			st.add_weights(zms.vertices[vi].bone_weights)
 		if zms.tangents_enabled():
 			# TODO: Use `Plane` to correctly load tangent
@@ -65,24 +74,30 @@ func import(src, dst, options, r_platform_variants, r_gen_files):
 	st.generate_normals()
 	st.generate_tangents()
 	var mesh = st.commit()
-	
-	var dds = ""
-	var png = ""
-	if src.get_extension() == "ZMS":
-		dds = src.get_basename() + ".DDS"
-		png = src.get_basename() + ".PNG"
-	else:
-		dds = src.get_basename() + ".dds"
-		png = src.get_basename() + ".png"
 
+	var tex_name = src.get_file().get_basename()
+	var tex_ext = ".png"
+	
+	if src.get_extension() == "ZMS":
+		tex_ext = ".PNG"
+
+	# Replace prefix
+	if tex_name.begins_with("m_"):
+		tex_name.erase(0, 2) 
+		tex_name = "t_" + tex_name;
+	
+	# Remove suffix
+	if tex_name.rfind("_") == tex_name.length() - 2:
+		tex_name.erase(tex_name.length() - 2, 2)
+	
 	var tex = null
 	var dir = Directory.new()
 	
-	# Prefer loading PNG if it exists, otherwise use DDS
-	if dir.file_exists(png):
-		tex = load(png)
-	elif dir.file_exists(dds):
-		tex = load(dds)
+	# Prefer loading specified texture, otherwise search for one
+	if dir.file_exists(options["texture"]):
+		tex = load(options["texture"])
+	else:
+		tex = load(src.get_base_dir() + "/" + tex_name + tex_ext)
 		
 	if tex and mesh.get_surface_count() == 1:
 		var mat = SpatialMaterial.new()
