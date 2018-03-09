@@ -1,6 +1,6 @@
 # rose-godot plugin
 A [Godot Engine](https://godotengine.com) 3.x plugin to import legacy assets
-ROSE Online.
+for ROSE Online.
 
 ## Features
 - ZMS Importer: Import ROSE Online static and skeletal meshes
@@ -13,7 +13,7 @@ ROSE Online.
 ## Godot version
 Built for Godot 3.x
 
-## Screenshet
+## Screenshot
 ![Dance](dance.gif?raw=true "Dance")
 
 
