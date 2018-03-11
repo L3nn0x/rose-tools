@@ -44,12 +44,9 @@ impl RoseFile for Heightmap {
         self.heights = vec![vec![0.0; self.width as usize]; self.height as usize];
         for h in 0..self.height {
             for w in 0..self.width {
-                let h = h as usize;
-                let w = w as usize;
-
                 let height = reader.read_f32()?;
 
-                self.heights[h][w] = height;
+                self.heights[h as usize][w as usize] = height;
 
                 if self.min_height.is_nan() || height < self.min_height {
                     self.min_height = height;

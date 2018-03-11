@@ -11,9 +11,9 @@ args:
         global: true
 
 subcommands:
-    - terrain:
-        about: Convert a ROSE terrain
+    - map:
+        about: Convert ROSE map files
         args:
-            - file:
-                help: .ZON file
+            - map_dir:
+                help: Map directory containing zon, him, til and ifo files
                 required: true
