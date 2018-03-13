@@ -1,7 +1,7 @@
 //! ROSE Online 3D Meshes
-use utils::{BoundingBox, Color4, Vector2, Vector3, Vector4};
+use failure::Error;
 use io::{RoseFile, ReadRoseExt, WriteRoseExt};
-use errors::*;
+use utils::{BoundingBox, Color4, Vector2, Vector3, Vector4};
 
 
 /// Mesh File
@@ -112,13 +112,13 @@ impl RoseFile for Mesh {
         }
     }
 
-    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<(), Error> {
         self.identifier = reader.read_cstring()?;
 
         let version = match self.identifier.as_str() {
             "ZMS0007" => 7,
             "ZMS0008" => 8,
-            _ => return Err("Unsupported Mesh version".into()),
+            _ => bail!("Unsupported Mesh version"),
         };
 
         self.format = reader.read_i32()?;
@@ -212,7 +212,7 @@ impl RoseFile for Mesh {
         Ok(())
     }
 
-    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<(), Error> {
         writer.write_cstring("ZMS0008")?;
         writer.write_i32(self.format)?;
 

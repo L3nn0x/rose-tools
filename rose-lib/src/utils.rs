@@ -1,4 +1,4 @@
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Color4 {
     pub r: f32,
     pub g: f32,
@@ -6,20 +6,20 @@ pub struct Color4 {
     pub a: f32,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Vector2<T> {
     pub x: T,
     pub y: T,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Vector3<T> {
     pub x: T,
     pub y: T,
     pub z: T,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Vector4<T> {
     pub w: T,
     pub x: T,
@@ -27,7 +27,7 @@ pub struct Vector4<T> {
     pub z: T,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq)]
 pub struct BoundingBox<T> {
     pub min: Vector3<T>,
     pub max: Vector3<T>,
@@ -47,6 +47,12 @@ impl Color4 {
 impl Vector2<f32> {
     pub fn new() -> Vector2<f32> {
         Vector2 { x: 0.0, y: 0.0 }
+    }
+}
+
+impl Vector2<i32> {
+    pub fn new() -> Vector2<i32> {
+        Vector2 { x: 0, y: 0 }
     }
 }
 

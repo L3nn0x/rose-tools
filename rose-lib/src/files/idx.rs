@@ -30,7 +30,7 @@
 use std::io::SeekFrom;
 use std::path::PathBuf;
 
-use errors::*;
+use failure::Error;
 use io::{RoseFile, ReadRoseExt, WriteRoseExt, PathRoseExt};
 
 /// Virtual file system index file
@@ -112,7 +112,7 @@ impl RoseFile for VfsIndex {
     }
 
     /// Load a `VfsIndex` from a reader
-    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<(), Error> {
         self.base_version = reader.read_i32()?;
         self.current_version = reader.read_i32()?;
 
@@ -153,7 +153,7 @@ impl RoseFile for VfsIndex {
     }
 
     /// Save a `VfsIndex` to a writer
-    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<(), Error> {
         writer.write_i32(self.base_version)?;
         writer.write_i32(self.current_version)?;
         writer.write_i32(self.file_systems.len() as i32)?;

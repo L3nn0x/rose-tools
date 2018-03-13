@@ -1,6 +1,6 @@
 //! ROSE Online Heightmaps
 use std::f32;
-use errors::*;
+use failure::Error;
 use io::{RoseFile, ReadRoseExt, WriteRoseExt};
 
 
@@ -35,7 +35,7 @@ impl RoseFile for Heightmap {
         }
     }
 
-    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<(), Error> {
         self.width = reader.read_i32()?;
         self.height = reader.read_i32()?;
         self.grid_count = reader.read_i32()?;
@@ -63,7 +63,7 @@ impl RoseFile for Heightmap {
         Ok(())
     }
 
-    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<(), Error> {
         // TODO: Implement writer
         unimplemented!();
     }

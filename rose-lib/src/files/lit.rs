@@ -3,7 +3,7 @@
 //! ROSE Online uses pre-baked lights that get rendered to a lightmap texture
 //! for blending with terrain/object textures.
 //!
-use errors::*;
+use failure::Error;
 use io::{RoseFile, ReadRoseExt, WriteRoseExt};
 
 /// Lightmap file
@@ -40,7 +40,7 @@ impl RoseFile for Lightmap {
         }
     }
 
-    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()> {
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<(), Error> {
         let object_count = reader.read_i32()?;
 
         for _ in 0..object_count {
@@ -74,7 +74,7 @@ impl RoseFile for Lightmap {
         Ok(())
     }
 
-    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> {
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<(), Error> {
         writer.write_i32(self.objects.len() as i32)?;
 
         for ref object in &self.objects {

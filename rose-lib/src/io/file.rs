@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter};
 use std::path::Path;
 
-use errors::*;
+use failure::Error;
 use io::{ReadRoseExt, WriteRoseExt};
 
 pub trait RoseFile {
@@ -18,10 +18,10 @@ pub trait RoseFile {
     fn new() -> Self;
 
     /// Read data from a reader
-    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<()>;
+    fn read<R: ReadRoseExt>(&mut self, reader: &mut R) -> Result<(), Error>;
 
     /// Write data to a writer
-    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<()> ;
+    fn write<W: WriteRoseExt>(&mut self, writer: &mut W) -> Result<(), Error> ;
 
     /// Read data from a `File`
     ///
@@ -34,7 +34,7 @@ pub trait RoseFile {
     /// let f = File::open("foo.zms").unwrap();
     /// let _ = ZMS::from_file(&f);
     /// ```
-    fn from_file(file: &File) -> Result<Self> 
+    fn from_file(file: &File) -> Result<Self, Error> 
         where Self: Sized
     {
         let mut rf = Self::new();
@@ -55,7 +55,7 @@ pub trait RoseFile {
     /// let mut zms = ZMS::new();
     /// let _ = zms.to_file(&f);
     /// ```
-    fn to_file(&mut self, file: &File) -> Result<()> {
+    fn to_file(&mut self, file: &File) -> Result<(), Error> {
         let mut writer = BufWriter::new(file);
         self.write(&mut writer)?;
         Ok(())
@@ -72,7 +72,7 @@ pub trait RoseFile {
     /// let p = PathBuf::from("/path/to/my.idx");
     /// let _ = ZMS::from_path(&p);
     /// ```
-    fn from_path(path: &Path) -> Result<Self>
+    fn from_path(path: &Path) -> Result<Self, Error>
         where Self: Sized
     {
         let f = File::open(path)?;
@@ -90,7 +90,7 @@ pub trait RoseFile {
     /// let p = PathBuf::from("/path/to/my.idx");
     /// let mut zms = ZMS::new();
     /// let _  = zms.to_path(&p);
-    fn to_path(&mut self, path: &Path) -> Result<()> {
+    fn to_path(&mut self, path: &Path) -> Result<(), Error> {
         let f = File::open(path)?;
         self.to_file(&f)?;
         Ok(())

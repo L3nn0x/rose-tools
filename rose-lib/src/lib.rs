@@ -1,15 +1,13 @@
 // `error_chain!` can recurse deeply
-#![recursion_limit = "1024"]
-
+#[macro_use] extern crate failure;
+#[macro_use] extern crate num_derive;
+#[macro_use] extern crate serde_derive;
 extern crate byteorder;
-#[macro_use]
-extern crate error_chain;
-#[macro_use]
-extern crate serde_derive;
+extern crate num;
+extern crate num_traits;
 
 pub mod io;
 pub mod utils;
-pub mod errors;
 
 pub mod files;
 

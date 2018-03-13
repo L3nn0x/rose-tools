@@ -5,7 +5,7 @@ use std::io::Cursor;
 use std::path::PathBuf;
 
 use roselib::files::ZMS;
-use roselib::io::{RoseFile};
+use roselib::io::RoseFile;
 
 #[test]
 fn read_zms() {
