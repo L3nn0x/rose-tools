@@ -13,7 +13,7 @@ use utils::{Vector2, Vector3};
 pub type ZON = Zone;
 
 /// Zone Type
-#[derive(Debug, Serialize, Deserialize, FromPrimitive)]
+#[derive(Debug, Serialize, Deserialize, FromPrimitive, PartialEq)]
 pub enum ZoneType {
     Grass = 0,
     Mountain = 1,
@@ -32,7 +32,7 @@ pub enum ZoneType {
     JunonPyramids = 14,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromPrimitive)]
+#[derive(Debug, Serialize, Deserialize, FromPrimitive, PartialEq)]
 pub enum ZoneBlockType {
     BasicInfo = 0,
     EventPoints = 1,
@@ -41,7 +41,7 @@ pub enum ZoneBlockType {
     Economy = 4,
 }
 
-#[derive(Debug, Serialize, Deserialize, FromPrimitive)]
+#[derive(Debug, Serialize, Deserialize, FromPrimitive, PartialEq)]
 pub enum ZoneTileRotation {
     Unkown = 0,
     None = 1,
@@ -54,56 +54,56 @@ pub enum ZoneTileRotation {
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct ZonePosition {
-    position: Vector2<f32>,
-    is_used: bool,
+    pub position: Vector2<f32>,
+    pub is_used: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ZoneEventPoint {
-    position: Vector3<f32>,
-    name: String,
+    pub position: Vector3<f32>,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ZoneTile {
-    layer1: i32,
-    layer2: i32,
-    offset1: i32,
-    offset2: i32,
-    blend: bool,
-    rotation: ZoneTileRotation,
-    tile_type: i32,
+    pub layer1: i32,
+    pub layer2: i32,
+    pub offset1: i32,
+    pub offset2: i32,
+    pub blend: bool,
+    pub rotation: ZoneTileRotation,
+    pub tile_type: i32,
 }
 
 /// Zone
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Zone {
-    zone_type: ZoneType,
-    width: i32,
-    height: i32,
-    grid_count: i32,
-    grid_size: f32,
-    start_position: Vector2<i32>,
-    positions: Vec<Vec<ZonePosition>>,
-    event_points: Vec<ZoneEventPoint>,
-    textures: Vec<String>,
-    tiles: Vec<ZoneTile>,
-    name: String,
-    is_underground: bool,
-    background_music: String,
-    sky: String,
-    economy_tick_rate: i32,
-    population_base: i32,
-    population_growth_rate: i32,
-    metal_consumption: i32,
-    stone_consumption: i32,
-    wood_consumption: i32,
-    leather_consumption: i32,
-    cloth_consumption: i32,
-    alchemy_consumption: i32,
-    chemical_consumption: i32,
-    medicine_consumption: i32,
-    food_consumption: i32,
+    pub zone_type: ZoneType,
+    pub width: i32,
+    pub height: i32,
+    pub grid_count: i32,
+    pub grid_size: f32,
+    pub start_position: Vector2<i32>,
+    pub positions: Vec<Vec<ZonePosition>>,
+    pub event_points: Vec<ZoneEventPoint>,
+    pub textures: Vec<String>,
+    pub tiles: Vec<ZoneTile>,
+    pub name: String,
+    pub is_underground: bool,
+    pub background_music: String,
+    pub sky: String,
+    pub economy_tick_rate: i32,
+    pub population_base: i32,
+    pub population_growth_rate: i32,
+    pub metal_consumption: i32,
+    pub stone_consumption: i32,
+    pub wood_consumption: i32,
+    pub leather_consumption: i32,
+    pub cloth_consumption: i32,
+    pub alchemy_consumption: i32,
+    pub chemical_consumption: i32,
+    pub medicine_consumption: i32,
+    pub food_consumption: i32,
 }
 
 impl ZonePosition {
