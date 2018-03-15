@@ -1,13 +1,14 @@
 #[macro_use] extern crate clap;
 #[macro_use] extern crate failure;
+#[macro_use] extern crate serde_derive;
+extern crate serde;
+extern crate serde_json;
 extern crate image;
 extern crate roselib;
 
 use std::f32;
-use std::ffi::OsStr;
 use std::fs;
 use std::fs::File;
-use std::io::{Write, BufWriter};
 use std::iter;
 use std::path::{Path, PathBuf};
 use std::process::exit;
@@ -17,8 +18,23 @@ use failure::Error;
 use image::{GrayImage, ImageBuffer};
 
 use roselib::files::*;
+use roselib::files::zon::ZoneTileRotation;
 use roselib::io::RoseFile;
 
+
+#[derive(Debug, Deserialize, Serialize)]
+struct TilemapTile {
+    layer1: i32,
+    layer2: i32,
+    rotation: ZoneTileRotation,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+struct TilemapFile {
+    textures: Vec<String>,
+    tiles: Vec<TilemapTile>,
+    tilemap: Vec<Vec<i32>>,
+}
 
 fn main() {
     let yaml = load_yaml!("main.yaml");
@@ -96,7 +112,7 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
         bail!("Map path is not a directory: {:?}", map_dir);
     }
 
-    println!("Loading map from: {:?}", map_dir);
+    println!("Loading map from: {}", map_dir.to_str().unwrap());
 
     // Collect coordinates from file names (using HIM as reference)
     let mut x_coords: Vec<u32> = Vec::new();
@@ -131,25 +147,34 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
     let mut max_height = f32::NAN;
     let mut min_height = f32::NAN;
 
-    //let mut heights: Vec<f32> = Vec::new();
     let mut heights: Vec<Vec<f32>> = Vec::new();
     heights.resize(
         map_height as usize,
         iter::repeat(f32::NAN).take(map_width as usize).collect()
     );
 
+    // Number of tiles in x and y direction
+    let tiles_x = (x_max - x_min + 1) * 16;
+    let tiles_y = (y_max - y_min + 1) * 16;
+
+    let mut tiles: Vec<Vec<i32>> = Vec::new();
+    tiles.resize(
+        tiles_y as usize,
+        iter::repeat(-1).take(tiles_x as usize).collect()
+    );
+
     for y in y_min..y_max+1 {
         for x in x_min..x_max+1 {
-            let fname = format!("{}_{}.HIM", x, y);
-            let fpath = map_dir.join(Path::new(&fname));
-
             //-- Load HIMs
-            let him = HIM::from_path(&fpath).unwrap();
+            let him_name = format!("{}_{}.HIM", x, y);
+            let him_path = map_dir.join(&him_name);
+
+            let him = HIM::from_path(&him_path).unwrap();
             if him.height != 65 || him.width != 65 {
                 bail!("Unexpected HIM dimensions. Expected 65x65: {} ({}x{})",
-                      &fpath.to_str().unwrap_or(&fname),
-                      him.height,
-                      him.width);
+                      &him_path.to_str().unwrap_or(&him_name),
+                      him.width,
+                      him.height);
             }
 
             for h in 0..him.height {
@@ -170,13 +195,39 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
                 }
             }
 
+            // -- Load TILs
+            let til_name = format!("{}_{}.TIL", x, y);
+            let til_path = map_dir.join(&til_name);
+
+            let til = TIL::from_path(&til_path).unwrap();
+            if til.height != 16 || til.width != 16 {
+                bail!("Unexpected TIL dimensions. Expected 16x16: {} ({}x{})",
+                    &til_path.to_str().unwrap_or(&til_name),
+                    til.width,
+                    til.height);
+            }
+
+
+            for h in 0..til.height {
+                for w in 0..til.width {
+                    let tile_id = til.tiles[h as usize][w as usize].tile_id;
+
+                    let new_x = ((x - x_min) * 16) + w as u32;
+                    let new_y = ((y - y_min) * 16) + h as u32;
+
+                    tiles[new_y as usize][new_x as usize] = tile_id;
+                }
+            }
+
             // TODO:
-            // Load TIL data
             // Load IFO data
         }
     }
 
-    // -- HIM
+    let map_name = map_dir.file_name().unwrap().to_str().unwrap();
+    let out_dir = Path::new(matches.value_of("out_dir").unwrap_or("out"));
+
+    // -- Heightmap image
     let delta_height = max_height - min_height;
 
     let mut height_image: GrayImage = ImageBuffer::new(
@@ -197,11 +248,39 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
         }
     }
 
-    // TODO: Change this to outdir + map dir name
-    height_image.save("test.png");
+    let mut height_file = PathBuf::from(out_dir);
+    height_file.push(map_name);
+    height_file.set_extension("png");
 
-    // Load ZON file and export as JSON
-    // Export TIL data as JSON
+    println!("Saving heightmap to: {}", &height_file.to_str().unwrap());
+    height_image.save(height_file)?;
+
+    // Create tilemap file
+    let zon = ZON::from_path(&map_dir.join(format!("{}.ZON", map_name)))?;
+
+    let mut tilemap_tiles: Vec<TilemapTile> = Vec::new();
+    for zon_tile in zon.tiles {
+        tilemap_tiles.push(TilemapTile {
+            layer1: zon_tile.layer1 + zon_tile.offset1,
+            layer2: zon_tile.layer2 + zon_tile.offset2,
+            rotation: zon_tile.rotation,
+        });
+    }
+
+    let tilemap = TilemapFile {
+        textures: zon.textures,
+        tiles: tilemap_tiles,
+        tilemap: tiles,
+    };
+
+    let mut tile_file = PathBuf::from(out_dir);
+    tile_file.push(format!("{}_tilemap", map_name));
+    tile_file.set_extension("json");
+
+    println!("Saving tilemap file to: {}", &tile_file.to_str().unwrap());
+    let f = File::create(tile_file)?;
+    serde_json::to_writer_pretty(f, &tilemap)?;
+
     // EXPORT IFO data as JSON
 
     Ok(())
