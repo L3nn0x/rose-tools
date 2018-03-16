@@ -1,3 +1,5 @@
+# Tools Dirs
+.import/
 target/
 out/
 *.swp
