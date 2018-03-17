@@ -33,7 +33,6 @@ func get_option_visibility(option, options):
 func get_resource_type():
 	return "Animation"
 
-
 func import(src, dst, options, r_platform_variants, r_gen_files):
 	var skel_path = options["skeleton"]
 	if not skel_path:

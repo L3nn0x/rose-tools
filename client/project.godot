@@ -15,7 +15,13 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "rose-import" )
+enabled=PoolStringArray( "rose-import", "tilemap-terrain" )
+
+[importer_defaults]
+
+tilemap_terrain.import={
+
+}
 
 [rendering]
 

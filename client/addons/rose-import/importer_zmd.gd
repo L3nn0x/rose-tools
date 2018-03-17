@@ -23,7 +23,7 @@ func get_preset_count():
 func get_preset_name(preset):
 	return "Default"
 	
-func get_import_options():
+func get_import_options(preset):
 	return []
 
 func get_option_visibility(option, options):
