@@ -248,6 +248,7 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
         }
     }
 
+    // Save heightmap image
     let mut height_file = PathBuf::from(out_dir);
     height_file.push(map_name);
     height_file.set_extension("png");
@@ -255,9 +256,17 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
     println!("Saving heightmap to: {}", &height_file.to_str().unwrap());
     height_image.save(height_file)?;
 
-    // Create tilemap file
+    // Dump ZON as JSON
     let zon = ZON::from_path(&map_dir.join(format!("{}.ZON", map_name)))?;
+    let mut zon_file = PathBuf::from(out_dir);
+    zon_file.push(format!("{}", map_name));
+    zon_file.set_extension("json");
 
+    println!("Dumping ZON file to: {}", &zon_file.to_str().unwrap());
+    let f = File::create(zon_file)?;
+    serde_json::to_writer_pretty(f, &zon)?;
+
+    // Create tilemap file
     let mut tilemap_tiles: Vec<TilemapTile> = Vec::new();
     for zon_tile in zon.tiles {
         tilemap_tiles.push(TilemapTile {
