@@ -147,20 +147,27 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
     let mut max_height = f32::NAN;
     let mut min_height = f32::NAN;
 
+    // Ensure map dimensions are divisible by 4 for tiling
+    let new_map_width = (map_width as f32 / 4.0).ceil() * 4.0;
+    let new_map_height = (map_height as f32 / 4.0).ceil() * 4.0;
+
+    let new_map_width = new_map_width as u32 + 1;
+    let new_map_height = new_map_height as u32 + 1;
+
     let mut heights: Vec<Vec<f32>> = Vec::new();
     heights.resize(
-        map_height as usize,
-        iter::repeat(f32::NAN).take(map_width as usize).collect()
+        new_map_height as usize,
+        iter::repeat(0.0).take(new_map_width as usize).collect()
     );
 
     // Number of tiles in x and y direction
-    let tiles_x = (x_max - x_min + 1) * 16;
-    let tiles_y = (y_max - y_min + 1) * 16;
+    let tiles_x = new_map_width / 4;
+    let tiles_y = new_map_height / 4;
 
     let mut tiles: Vec<Vec<i32>> = Vec::new();
     tiles.resize(
         tiles_y as usize,
-        iter::repeat(-1).take(tiles_x as usize).collect()
+        iter::repeat(0).take(tiles_x as usize).collect()
     );
 
     for y in y_min..y_max+1 {
@@ -231,12 +238,12 @@ fn convert_map(matches: &ArgMatches) -> Result<(), Error> {
     let delta_height = max_height - min_height;
 
     let mut height_image: GrayImage = ImageBuffer::new(
-        map_width,
-        map_height,
+        new_map_width,
+        new_map_height,
     );
 
-    for y in 0..map_height {
-        for x in 0..map_width {
+    for y in 0..new_map_height {
+        for x in 0..new_map_width {
             let height = heights[y as usize][x as usize];
 
             let norm_height = |h| {

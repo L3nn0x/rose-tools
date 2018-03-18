@@ -48,20 +48,19 @@ impl RoseFile for Tilemap {
         self.width = reader.read_i32()?;
         self.height = reader.read_i32()?;
 
-        for _ in 0..self.height {
-            let row = iter::repeat(Tile::new())
-                .take(self.width as usize)
-                .collect();
-            self.tiles.push(row);
-        }
+        self.tiles.resize(
+            self.width as usize,
+            iter::repeat(Tile::new()).take(self.width as usize).collect()
+        );
 
-        for w in 0..self.width {
-            for h in 0..self.height {
+        for h in 0..self.height {
+            for w in 0..self.width {
                 let mut t = Tile::new();
                 t.brush_id = reader.read_u8()?;
                 t.tile_idx = reader.read_u8()?;
                 t.tile_set = reader.read_u8()?;
                 t.tile_id = reader.read_i32()?;
+
                 self.tiles[h as usize][w as usize] = t;
             }
         }
