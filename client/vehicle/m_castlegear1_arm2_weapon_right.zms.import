@@ -1,0 +1,14 @@
+[remap]
+
+importer="rose.zms.import"
+type="Mesh"
+path="res://.import/m_castlegear1_arm2_weapon_right.zms-35b5934973012a0b95098190dfcb3093.mesh"
+
+[deps]
+
+source_file="res://vehicle/m_castlegear1_arm2_weapon_right.zms"
+dest_files=[ "res://.import/m_castlegear1_arm2_weapon_right.zms-35b5934973012a0b95098190dfcb3093.mesh" ]
+
+[params]
+
+texture=""

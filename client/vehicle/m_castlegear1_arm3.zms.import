@@ -1,0 +1,14 @@
+[remap]
+
+importer="rose.zms.import"
+type="Mesh"
+path="res://.import/m_castlegear1_arm3.zms-dc28018546e899c5248d7bc43fa32a91.mesh"
+
+[deps]
+
+source_file="res://vehicle/m_castlegear1_arm3.zms"
+dest_files=[ "res://.import/m_castlegear1_arm3.zms-dc28018546e899c5248d7bc43fa32a91.mesh" ]
+
+[params]
+
+texture=""

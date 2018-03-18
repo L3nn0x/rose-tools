@@ -1,0 +1,13 @@
+[remap]
+
+importer="rose.zmd.import"
+type="PackedScene"
+path="res://.import/skel_cart.zmd-ec3cf76bf9e5c4882522bf26db309049.tscn"
+
+[deps]
+
+source_file="res://vehicle/skel_cart.zmd"
+dest_files=[ "res://.import/skel_cart.zmd-ec3cf76bf9e5c4882522bf26db309049.tscn" ]
+
+[params]
+

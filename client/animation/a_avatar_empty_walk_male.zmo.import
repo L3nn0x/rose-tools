@@ -1,0 +1,14 @@
+[remap]
+
+importer="rose.zmo.import"
+type="Animation"
+path="res://.import/a_avatar_empty_walk_male.zmo-78daa8bc4297f37257b7f79084a4e088.anim"
+
+[deps]
+
+source_file="res://animation/a_avatar_empty_walk_male.zmo"
+dest_files=[ "res://.import/a_avatar_empty_walk_male.zmo-78daa8bc4297f37257b7f79084a4e088.anim" ]
+
+[params]
+
+skeleton="res://character/sk_male.zmd"

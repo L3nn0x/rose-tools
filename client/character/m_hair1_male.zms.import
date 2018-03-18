@@ -1,0 +1,14 @@
+[remap]
+
+importer="rose.zms.import"
+type="Mesh"
+path="res://.import/m_hair1_male.zms-361bfbd0779f7c10c10766fc81ef17e1.mesh"
+
+[deps]
+
+source_file="res://character/m_hair1_male.zms"
+dest_files=[ "res://.import/m_hair1_male.zms-361bfbd0779f7c10c10766fc81ef17e1.mesh" ]
+
+[params]
+
+texture=""

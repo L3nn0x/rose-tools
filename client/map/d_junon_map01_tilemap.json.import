@@ -1,0 +1,13 @@
+[remap]
+
+importer="tilemap.json.import"
+type="script"
+path="res://.import/d_junon_map01_tilemap.json-7991472e9bb3b1dd86abf746624e1487.json"
+
+[deps]
+
+source_file="res://map/d_junon_map01_tilemap.json"
+dest_files=[ "res://.import/d_junon_map01_tilemap.json-7991472e9bb3b1dd86abf746624e1487.json" ]
+
+[params]
+

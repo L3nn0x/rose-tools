@@ -1,0 +1,14 @@
+[remap]
+
+importer="rose.zmo.import"
+type="Animation"
+path="res://.import/a_avatar_dance3_male.zmo-f377cf81615f5df8e03170bb6ecc36f6.anim"
+
+[deps]
+
+source_file="res://animation/a_avatar_dance3_male.zmo"
+dest_files=[ "res://.import/a_avatar_dance3_male.zmo-f377cf81615f5df8e03170bb6ecc36f6.anim" ]
+
+[params]
+
+skeleton="res://character/sk_male.zmd"
