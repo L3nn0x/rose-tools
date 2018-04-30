@@ -66,10 +66,10 @@ func import(src, dst, options, r_platform_variants, r_gen_files):
 			st.add_vertex(Utils.r2g_position(zms.vertices[vi].position))
 	
 	for i in range(zms.indices.size()):
-		st.add_index(zms.indices[i].z)
-		st.add_index(zms.indices[i].y)
 		st.add_index(zms.indices[i].x)
-	
+		st.add_index(zms.indices[i].y)
+		st.add_index(zms.indices[i].z)
+
 	st.index()
 	st.generate_normals()
 	st.generate_tangents()
