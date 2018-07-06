@@ -1,6 +1,7 @@
 # Changelog
 ## 7/5/2018
 - Added ZON file script
+- Added HIM file script
 - Added new README and CHANGELOG
 
 ## 6/9/2018
