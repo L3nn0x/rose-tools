@@ -17,6 +17,12 @@ func get_cstring():
     
     return buffer.get_string_from_ascii()
 
+func get_string_u8():
+    # Get byte-prefixed string
+    var length = get_8()
+    var buffer = get_buffer(length)
+    return buffer.get_string_from_ascii()
+
 func get_quat_wxyz():
     var w = get_float()
     var x = get_float()
@@ -32,11 +38,17 @@ func get_quat():
     var w = get_float()
     
     return Quat(x, y, z, w)
-        
+
 func get_vector2_f32():
     var v = Vector2(0, 0)
     v.x = get_float()
     v.y = get_float()
+    return v
+
+func get_vector2_i32():
+    var v = Vector2(0, 0)
+    v.x = get_32()
+    v.y = get_32()
     return v
     
 func get_vector3_f32():
