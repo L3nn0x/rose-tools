@@ -1,6 +1,9 @@
 tool
 extends File
 
+func get_bool():
+    return !(get_8() == 0)
+
 func get_fstring(length):
     # Get fixed size string
     var buffer = get_buffer(length)
@@ -64,7 +67,14 @@ func get_vector3_i16():
     v.y = get_16()
     v.z = get_16()
     return v
-    
+
+func get_vector3_i32():
+    var v = Vector3(0, 0, 0)
+    v.x = get_32()
+    v.y = get_32()
+    v.z = get_32()
+    return v
+
 func get_color4():
     var c = Color(0, 0, 0, 0)
     c.r = get_float()
@@ -78,9 +88,18 @@ func get_array_f32(size):
     for i in range(size):
         a.append(get_float())
     return a
-    
+
 func get_array_i16(size):
     var a = []
     for i in range(size):
         a.append(get_16())
     return a
+
+func get_matrix4():
+    var m = []
+    for i in range(4):
+        var n = []
+        for i in range(4):
+            n.append(get_float())
+        m.append(n)
+    return m
