@@ -154,7 +154,7 @@ class MonsterSpawn extends Block:
             var spawn = MonsterSpawnPoint.new()
             spawn.name = f.get_string_u8()
             spawn.monster = f.get_32()
-            spawn.count - f.get_32()
+            spawn.count = f.get_32()
             self.tactical_spawns.append(spawn)
         
         self.interval = f.get_32()
