@@ -22,7 +22,7 @@ func read(f):
     self.width = f.get_32()
     self.height = f.get_32()
     self.grid_count = f.get_32()
-    self.scale = f.get_32()
+    self.scale = f.get_float()
     
     for h in range(self.height):
         var row = []
