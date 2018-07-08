@@ -1,4 +1,10 @@
 # Changelog
+
+## 7/7/2018
+- Added IFO/TIL/HIM file scripts
+- Added ZON importer
+  - **NOTE:** Currently it only imports the terrain meshes
+
 ## 7/5/2018
 - Added ZON file script
 - Added HIM file script
